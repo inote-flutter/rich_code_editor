@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 
 import 'exports.dart';
 
@@ -43,7 +44,7 @@ class RichCodeEditingController extends ValueNotifier<TextEditingValue> implemen
   ///
   /// By default makes text in composing range appear as underlined.
   /// Descendants can override this method to customize appearance of text.
-  TextSpan buildTextSpan({required BuildContext context, TextStyle? style, required bool withComposing}) {
+  TextSpan buildTextSpan({@required BuildContext context, TextStyle style, @required bool withComposing}) {
     // if (!value.composing.isValid || !withComposing) {
     //   return TextSpan(style: style, text: text);
     // }
