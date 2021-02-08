@@ -43,7 +43,7 @@ class RichCodeEditingController extends ValueNotifier<TextEditingValue> implemen
   ///
   /// By default makes text in composing range appear as underlined.
   /// Descendants can override this method to customize appearance of text.
-  TextSpan buildTextSpan({TextStyle style , bool withComposing}) {
+  TextSpan buildTextSpan({required BuildContext context, TextStyle? style, required bool withComposing}) {
     // if (!value.composing.isValid || !withComposing) {
     //   return TextSpan(style: style, text: text);
     // }
