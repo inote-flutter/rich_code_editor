@@ -763,7 +763,7 @@ class RichEditableCode extends EditableText {
   /// animate on Android platforms.
   final bool cursorOpacityAnimates;
 
-  ///{@macro flutter.rendering.editable.cursorOffset}
+  // ///{@macro flutter.rendering.editable.cursorOffset}
   final Offset cursorOffset;
 
   ///{@macro flutter.rendering.editable.paintCursorOnTop}
@@ -1761,7 +1761,7 @@ class RichEditableCodeState extends EditableTextState {
               rendererIgnoresPointer: widget.rendererIgnoresPointer,
               cursorWidth: widget.cursorWidth,
               cursorRadius: widget.cursorRadius,
-              cursorOffset: widget.cursorOffset,
+              cursorOffset: widget.cursorOffset ?? Offset.zero,
               paintCursorAboveText: widget.paintCursorAboveText,
               enableInteractiveSelection: widget.enableInteractiveSelection,
               textSelectionDelegate: this,
@@ -1789,6 +1789,7 @@ class RichEditableCodeState extends EditableTextState {
     }
     // Read only mode should not paint text composing.
     return widget.controller.buildTextSpan(
+      context: context,
       style: widget.style,
       withComposing: !widget.readOnly,
     );

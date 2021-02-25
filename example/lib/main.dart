@@ -1,9 +1,15 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rich_code_editor/exports.dart';
 
 import 'DummySyntaxHighlighter.dart';
 
 void main() {
+  if (Platform.isWindows)
+    debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
+
   runApp(MaterialApp(
     home: Home(),
   ));
