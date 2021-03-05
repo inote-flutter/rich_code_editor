@@ -1789,7 +1789,6 @@ class RichEditableCodeState extends EditableTextState {
     }
     // Read only mode should not paint text composing.
     return widget.controller.buildTextSpan(
-      context: context,
       style: widget.style,
       withComposing: !widget.readOnly,
     );
