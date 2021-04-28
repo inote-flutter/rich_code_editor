@@ -217,7 +217,7 @@ class RichEditableCode extends EditableText {
             (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
         inputFormatters = maxLines == 1
             ? <TextInputFormatter>[
-                BlacklistingTextInputFormatter.singleLineFormatter,
+                FilteringTextInputFormatter.singleLineFormatter,
                 ...inputFormatters ??
                     const Iterable<TextInputFormatter>.empty(),
               ]
@@ -883,6 +883,8 @@ class RichEditableCodeState extends EditableTextState {
   final ValueNotifier<bool> _cursorVisibilityNotifier =
       ValueNotifier<bool>(true);
   final GlobalKey _editableKey = GlobalKey();
+  final ClipboardStatusNotifier _clipboardStatus =
+      kIsWeb ? null : ClipboardStatusNotifier();
 
   TextInputConnection _textInputConnection;
   TextSelectionOverlay _selectionOverlay;
@@ -928,11 +930,18 @@ class RichEditableCodeState extends EditableTextState {
 
   PressedKey _pressedKey;
 
+  void _onChangedClipboardStatus() {
+    setState(() {
+      // Inform the widget that the value of clipboardStatus has changed.
+    });
+  }
+
   // State lifecycle:
 
   @override
   void initState() {
     super.initState();
+    _clipboardStatus?.addListener(_onChangedClipboardStatus);
     widget.controller.addListener(_didChangeTextEditingValue);
     _focusAttachment = widget.focusNode.attach(context);
     widget.focusNode.addListener(_handleFocusChanged);
@@ -991,6 +1000,11 @@ class RichEditableCodeState extends EditableTextState {
         textAlign: widget.textAlign,
       );
     }
+    if (widget.selectionEnabled &&
+        pasteEnabled &&
+        widget.selectionControls?.canPaste(this) == true) {
+      _clipboardStatus?.update();
+    }
   }
 
   @override
@@ -1006,6 +1020,8 @@ class RichEditableCodeState extends EditableTextState {
     _selectionOverlay = null;
     _focusAttachment.detach();
     widget.focusNode.removeListener(_handleFocusChanged);
+    _clipboardStatus?.removeListener(_onChangedClipboardStatus);
+    _clipboardStatus?.dispose();
     super.dispose();
   }
 
@@ -1345,6 +1361,11 @@ class RichEditableCodeState extends EditableTextState {
 
   void _handleSelectionChanged(TextSelection selection,
       RenderEditable renderObject, SelectionChangedCause cause) {
+    // We return early if the selection is not valid. This can happen when the
+    // text of [EditableText] is updated at the same time as the selection is
+    // changed by a gesture event.
+    if (!widget.controller.isSelectionWithinTextBounds(selection)) return;
+
     widget.controller.selection = selection;
 
     // This will show the keyboard for all selection changes on the
@@ -1356,6 +1377,7 @@ class RichEditableCodeState extends EditableTextState {
 
     if (widget.selectionControls != null) {
       _selectionOverlay = TextSelectionOverlay(
+        clipboardStatus: _clipboardStatus,
         context: context,
         value: _value,
         debugRequiredFor: widget,
@@ -1685,7 +1707,7 @@ class RichEditableCodeState extends EditableTextState {
             copyEnabled &&
             _hasFocus &&
             controls?.canCopy(this) == true
-        ? () => controls.handleCopy(this, null)
+        ? () => controls.handleCopy(this, _clipboardStatus)
         : null;
   }
 
@@ -1702,7 +1724,9 @@ class RichEditableCodeState extends EditableTextState {
     return widget.selectionEnabled &&
             pasteEnabled &&
             _hasFocus &&
-            controls?.canPaste(this) == true
+            controls?.canPaste(this) == true &&
+            (_clipboardStatus == null ||
+                _clipboardStatus.value == ClipboardStatus.pasteable)
         ? () => controls.handlePaste(this)
         : null;
   }
@@ -1780,7 +1804,7 @@ class RichEditableCodeState extends EditableTextState {
   TextSpan buildTextSpan() {
     if (widget.obscureText) {
       String text = _value.text;
-      text = '*' * text.length;
+      text = widget.obscuringCharacter * text.length;
       final int o =
           _obscureShowCharTicksPending > 0 ? _obscureLatestCharIndex : null;
       if (o != null && o >= 0 && o < text.length)
