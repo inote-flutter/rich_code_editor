@@ -1688,7 +1688,7 @@ class RichEditableCodeState extends EditableTextState {
   }
 
   @override
-  void hideToolbar() {
+  void hideToolbar([bool hideHandles = true]) {
     _selectionOverlay?.hide();
   }
 
