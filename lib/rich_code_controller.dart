@@ -1,6 +1,6 @@
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter/foundation.dart';
+// import 'package:flutter/foundation.dart';
 
 import 'exports.dart';
 
@@ -11,14 +11,14 @@ class RichCodeEditingController extends ValueNotifier<TextEditingValue> implemen
   ///
   /// This constructor treats a null [text] argument as if it were the empty
   /// string.
-  RichCodeEditingController(this.syntaxHighlighter, { String text })
+  RichCodeEditingController(this.syntaxHighlighter, { String? text })
     : super(text == null ? TextEditingValue.empty : TextEditingValue(text: text));
 
   /// Creates a controller for an editable text field from an initial [TextEditingValue].
   ///
   /// This constructor treats a null [value] argument as if it were
   /// [TextEditingValue.empty].
-  RichCodeEditingController.fromValue(TextEditingValue value, this.syntaxHighlighter)
+  RichCodeEditingController.fromValue(TextEditingValue? value, this.syntaxHighlighter)
     : super(value ?? TextEditingValue.empty);
 
   /// The current string the user is editing.
@@ -44,7 +44,7 @@ class RichCodeEditingController extends ValueNotifier<TextEditingValue> implemen
   ///
   /// By default makes text in composing range appear as underlined.
   /// Descendants can override this method to customize appearance of text.
-  TextSpan buildTextSpan({@required BuildContext context, TextStyle style, @required bool withComposing}) {
+  TextSpan buildTextSpan({required BuildContext context, TextStyle? style, required bool withComposing}) {
     // if (!value.composing.isValid || !withComposing) {
     //   return TextSpan(style: style, text: text);
     // }
@@ -59,7 +59,7 @@ class RichCodeEditingController extends ValueNotifier<TextEditingValue> implemen
     return _currentSpan;
   }
 
-  TextSpan _currentSpan;
+  late TextSpan _currentSpan;
   TextSpan get currentSpan => _currentSpan;
 
   /// The currently selected [text].
